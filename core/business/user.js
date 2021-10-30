@@ -1,11 +1,9 @@
-const bcrypt = require('bcrypt-nodejs')
-
 module.exports = app => {
     const { existOrError, notExistsOrError, equalsOrError, validEmail, validId, } = app.utils.validation
-    const encryptPassword = password => {
-        const salt = bcrypt.genSaltSync(10)
-        return bcrypt.hashSync(password, salt)
-    }
+    const {encryptPassword} = app.utils.utility
+    const { dbNames} = app.utils.consts
+
+
 
     const save = async (req, res) => {
         const user = { ...req.body }
@@ -19,7 +17,7 @@ module.exports = app => {
             existOrError(user.confirmsenha, "É necessário confirmar sua senha")
             equalsOrError(user.senha, user.confirmsenha, "Senhas não se coincidem")
 
-            const userFromDb = await app.db('usuarios')
+            const userFromDb = await app.db(dbNames.users)
                 .where({ email: user.email }).first()
             if (!user.id) {
                 notExistsOrError(userFromDb, "Usuário já cadastrado")
@@ -33,17 +31,18 @@ module.exports = app => {
         delete user.confirmsenha
 
         if (user.id) {
-            app.db('usuarios')
+            user.data_de_alteracao = new Date()
+            app.db(dbNames.users)
                 .update(user)
                 .where({ id: user.id })
                 
                 .then(_ => res.status(202).send())
-                .catch(err => res.status(500).send(err))
+                .catch(err => res.status(500).send({error:err.detail}))
         } else {
-            app.db('usuarios')
+            app.db(dbNames.users)
                 .insert(user)
                 .then(_ => res.status(201).send())
-                .catch(err => res.status(500).send(err))
+                .catch(err => res.status(500).send({error:err.detail}))
         }
     }
 
@@ -51,7 +50,7 @@ module.exports = app => {
     const get = async (req, res) => {
         const page = req.query.page || 1
 
-        const result = await app.db('usuarios')
+        const result = await app.db(dbNames.users)
                                 
                                 .count('id')
                                 .first()
@@ -59,20 +58,20 @@ module.exports = app => {
         const count = parseInt(result.count)
 
         
-        app.db('usuarios')
+        app.db(dbNames.users)
             .select('id', 'nome', 'email')
             
             .limit(limit)
             .offset(page*limit-limit)
-            .then(users => res.json({data:users,count,limit}))
-            .catch(err => res.status(500).send(err))
+            .then(users => res.json({users,count,limit}))
+            .catch(err => res.status(500).send({error:err.detail}))
     }
 
     const getById = async (req, res) => {
         try {
             validId(req.params.id, "ID invalido")
 
-            const existId = await app.db('usuarios')
+            const existId = await app.db(dbNames.users)
                 .where({ id: req.params.id })
                 .first()
 
@@ -80,19 +79,19 @@ module.exports = app => {
         } catch (msg) {
             return res.status(400).send(msg)
         }
-        app.db('usuarios')
+        app.db(dbNames.users)
             .select('id', 'nome', 'email')
             .where({ id: req.params.id })
             
             .then(user => res.json(user))
-            .catch(err => res.status(500).send(err))
+            .catch(err => res.status(500).send({error:err.detail}))
     }
 
     const remove = async (req, res) => {
         try {
-            const rowsUpdated = await app.db('usuarios')
-                .update({ deletedAt: new Date() })
+            const rowsUpdated = await app.db(dbNames.users)
                 .where({ id: req.params.id })
+                .del()
 
             existOrError(rowsUpdated, "Usuário inexistente")
 

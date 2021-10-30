@@ -1,6 +1,6 @@
 module.exports = app =>{
-    const {save} = app.api.business.user
-    const {signIn,validateToken} = app.api.business.auth
+    const {save} = app.core.business.user
+    const {signIn,validateToken} = app.core.business.auth
 
     app.post('/signup', save)
     app.post('/signin', signIn)

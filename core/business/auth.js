@@ -2,12 +2,14 @@ const jwt = require('jwt-simple')
 const bcrypt = require('bcrypt-nodejs')
 
 module.exports = app => {
+    const { dbNames} = app.utils.consts
+
     const signIn = async (req, res) => {
         if(!req.body.email || !req.body.password){
             return res.status(400).send("Informe usuário e senha")
         }
 
-        const user = await app.db('usarios')
+        const user = await app.db(dbNames.users)
                         .where({email:req.body.email})
                         .first()
 

@@ -9,12 +9,12 @@ app.db = db
 consign()
     .include('./config/passport.js')
     .then('./config/middlewares.js')
-    .then('./utils/validation.js')
-    .then('./api/business')
+    .then('./utils/')
+    .then('./core/queries')
+    .then('./core/business')
     .then('./api/routes')
     .into(app)
 
 app.listen(port,()=>{
-    console.log(app)
     console.log('Backend iniciado com sucesso')
 })

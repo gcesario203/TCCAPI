@@ -1,6 +1,6 @@
 module.exports = app => {
     const { authenticate } = app.config.passport
-    const { save, get, getById,remove} = app.api.business.user
+    const { save, get, getById,remove} = app.core.business.user
 
     app.route('/users')
         // .all(authenticate())
