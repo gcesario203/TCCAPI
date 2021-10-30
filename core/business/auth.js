@@ -15,6 +15,7 @@ module.exports = app => {
 
         if(!user) return res.status(400).send("usuário não encontrado")
 
+        console.log('birl ', req.body.senha,user.senha)
         const isMatch = bcrypt.compareSync(req.body.senha,user.senha)
 
         if(!isMatch) return res.status(401).send('Email/Senha inválidos')

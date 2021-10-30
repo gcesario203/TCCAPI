@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt-nodejs')
+
 module.exports = app => {
     const { existOrError, validId, notExistsOrError } = app.utils.validation
     const { roomType, dbNames } = app.utils.consts
@@ -35,7 +37,7 @@ module.exports = app => {
         }
 
         if (room.tipo === roomType.private) {
-            room.chave = encryptPassword(room.chave)
+            room.chave = encryptPassword(room.chave.toString())
         }
         else {
             room.chave = null
@@ -123,7 +125,8 @@ module.exports = app => {
     const joinRoom = async (req, res) => {
         const userxroom = {
             usuarioId: req.body.usuarioId,
-            salaId: req.body.salaId
+            salaId: req.body.salaId,
+            chave: req.body.chave
         }
         try {
             const checkRoomId = await app.db(dbNames.rooms)
@@ -131,6 +134,16 @@ module.exports = app => {
                 .first()
 
             existOrError(checkRoomId, "Sala inexistente")
+
+            if(checkRoomId.tipo === roomType.private)
+            {
+                existOrError(userxroom.chave, "Chave para entrada de usuário não inserida")
+
+                console.log('oie ', bcrypt.compareSync(userxroom.chave, checkRoomId.chave))
+                const isMatch = bcrypt.compareSync(userxroom.chave, checkRoomId.chave)
+
+                if(!isMatch) return res.status(401).send('Chave incorreta')
+            }
 
             const checkUserId = await app.db(dbNames.users)
                 .where({ id: userxroom.usuarioId })
@@ -149,7 +162,7 @@ module.exports = app => {
         }
 
         app.db(dbNames.userRoomRelation)
-            .insert(userxroom)
+            .insert({usuarioId: userxroom.usuarioId, salaId: userxroom.salaId})
             .then(_ => res.status(201).send())
             .catch(err => res.status(500).send({ error: err.detail }))
     }
@@ -187,6 +200,7 @@ module.exports = app => {
     }
 
     const getRoomsXUsers = async (req, res) => {
+        console.log('aqui')
         const page = req.query.page || 1
         app.db
             .raw(getRoomsUserRelation
@@ -237,7 +251,7 @@ module.exports = app => {
                 .replace('#offset', page * limit - limit)
                 .replace('#limit', limit))
             
-            .then(rooms => res.json({ rooms: rooms.rows, limit }))
+            .then(rooms => res.json({ users: rooms.rows, limit }))
             .catch(err => res.status(500).send(err))
     }
 

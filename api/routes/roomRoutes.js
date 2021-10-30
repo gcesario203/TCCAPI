@@ -11,22 +11,22 @@ module.exports = app => {
             getUsersFromRoomId} = app.core.business.room
 
     app.route('/rooms')
-        // .all()
-        .post(authenticate(save))
+        .all(authenticate())
+        .post(save)
         .get(get)
 
     app.route('/rooms/:id')
-        // .all(authenticate())
+        .all(authenticate())
         .get(getById)
-        .put(authenticate(save))
-        .delete(authenticate(remove))
+        .put(save)
+        .delete(remove)
 
     app.route('/rooms/join')
         .all(authenticate())
         .post(joinRoom)
         .delete(disconnectFromRoom)
 
-    app.route('/rooms/all')
+    app.route('/roomsGeneral')
         .get(getRoomsXUsers)
 
     app.route('/rooms/user/:id')
@@ -34,6 +34,6 @@ module.exports = app => {
         .get(getRoomsXUsersByUserId)
 
     app.route('/rooms/room/:id')
-        // .all(authenticate())
-        .get(authenticate(getUsersFromRoomId))
+        .all(authenticate())
+        .get(getUsersFromRoomId)
 }
