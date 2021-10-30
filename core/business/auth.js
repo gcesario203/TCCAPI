@@ -5,7 +5,7 @@ module.exports = app => {
     const { dbNames} = app.utils.consts
 
     const signIn = async (req, res) => {
-        if(!req.body.email || !req.body.password){
+        if(!req.body.email || !req.body.senha){
             return res.status(400).send("Informe usuário e senha")
         }
 
@@ -15,7 +15,7 @@ module.exports = app => {
 
         if(!user) return res.status(400).send("usuário não encontrado")
 
-        const isMatch = bcrypt.compareSync(req.body.password,user.password)
+        const isMatch = bcrypt.compareSync(req.body.senha,user.senha)
 
         if(!isMatch) return res.status(401).send('Email/Senha inválidos')
 
