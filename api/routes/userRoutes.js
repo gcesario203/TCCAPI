@@ -3,12 +3,12 @@ module.exports = app => {
     const { save, get, getById,remove} = app.core.business.user
 
     app.route('/users')
-        // .all(authenticate())
+        .all(authenticate())
         .post(save)
         .get(get)
 
     app.route('/users/:id')
-        // .all(authenticate())
+        .all(authenticate())
         .get(getById)
         .put(save)
         .delete(remove)

@@ -138,8 +138,7 @@ module.exports = app => {
             if(checkRoomId.tipo === roomType.private)
             {
                 existOrError(userxroom.chave, "Chave para entrada de usuário não inserida")
-
-                console.log('oie ', bcrypt.compareSync(userxroom.chave, checkRoomId.chave))
+                
                 const isMatch = bcrypt.compareSync(userxroom.chave, checkRoomId.chave)
 
                 if(!isMatch) return res.status(401).send('Chave incorreta')
