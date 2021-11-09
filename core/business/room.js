@@ -85,7 +85,7 @@ module.exports = app => {
         }
     }
 
-    const limit = 3
+    const limit = 10
 
     const get = async (req, res) => {
         const page = req.query.page || 1
@@ -199,7 +199,6 @@ module.exports = app => {
     }
 
     const getRoomsXUsers = async (req, res) => {
-        console.log('aqui')
         const page = req.query.page || 1
         app.db
             .raw(getRoomsUserRelation

@@ -2,13 +2,14 @@ module.exports = app => {
 
     const room = {
         getRoomsUserRelation: `
-        select salas.nome as roomName, count(usuarios.nome) AS usrQtde, usersxrooms."salaId"
+        select salas.nome as roomName,
+             count(usuarios.nome) AS usrQtde, usersxrooms."salaId", salas.tipo AS tipo
                             from usersxrooms
                             inner join usuarios
                                 ON usersxrooms."usuarioId" = usuarios.id
                             inner join salas
                                 on usersxrooms."salaId" = salas.id
-                            GROUP BY salas.nome, usersxrooms."salaId"
+                            GROUP BY salas.nome, usersxrooms."salaId", salas.tipo
                             OFFSET #offset
                             LIMIT #limit;
         `,

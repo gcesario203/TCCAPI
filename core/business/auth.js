@@ -8,7 +8,6 @@ module.exports = app => {
         if(!req.body.email || !req.body.senha){
             return res.status(400).send("Informe usuário e senha")
         }
-
         const user = await app.db(dbNames.users)
                         .where({email:req.body.email})
                         .first()
@@ -28,7 +27,7 @@ module.exports = app => {
             exp:now+(60*60*24*3)
         }
 
-        res.json({
+        res.status(200).json({
             ...payload,
             token:jwt.encode(payload,"TCCAPP")
         })
