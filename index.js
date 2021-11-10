@@ -1,5 +1,5 @@
 const app = require('express')()
-const port = 3000
+const port = process.env.PORT || 3000
 const consign = require('consign')
 const db = require('./config/db')
 
