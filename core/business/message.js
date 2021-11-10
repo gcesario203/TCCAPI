@@ -42,7 +42,7 @@ module.exports = app => {
                 .catch(trx.rollback)
             })
             .then(() => res.status(200).send())
-            .catch(err => res.status(500).send(err))
+            .catch(err => res.status(500).send({error:err}))
         })
     }
 
@@ -55,13 +55,13 @@ module.exports = app => {
 
             existOrError(existId, "Sala inexistente")
         } catch (msg) {
-            return res.status(400).send(msg)
+            return res.status(400).send({error:msg})
         }
         app.db
             .raw(getMessagesByRoom
                 .replace('#roomId', req.params.id))
             .then(messages => res.json({ messages: messages.rows }))
-            .catch(err => res.status(500).send(err))
+            .catch(err => res.status(500).send({error:err}))
     }
 
     return { syncMessages, callMessagesByRoom }

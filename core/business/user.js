@@ -23,7 +23,7 @@ module.exports = app => {
                 notExistsOrError(userFromDb, "Usuário já cadastrado")
             }
         } catch (msg) {
-            return res.status(400).send(msg)
+            return res.status(400).send({error:msg})
         }
 
         user.senha = encryptPassword(req.body.senha)
@@ -37,12 +37,12 @@ module.exports = app => {
                 .where({ id: user.id })
                 
                 .then(_ => res.status(202).send())
-                .catch(err => res.status(500).send({error:err.detail}))
+                .catch(err => res.status(500).send({error:err}))
         } else {
             app.db(dbNames.users)
                 .insert(user)
                 .then(_ => res.status(201).send())
-                .catch(err => res.status(500).send({error:err.detail}))
+                .catch(err => res.status(500).send({error:err}))
         }
     }
 
@@ -64,7 +64,7 @@ module.exports = app => {
             .limit(limit)
             .offset(page*limit-limit)
             .then(users => res.json({users,count,limit}))
-            .catch(err => res.status(500).send({error:err.detail}))
+            .catch(err => res.status(500).send({error:err}))
     }
 
     const getById = async (req, res) => {
@@ -77,14 +77,14 @@ module.exports = app => {
 
             existOrError(existId, "Usuário inexistente")
         } catch (msg) {
-            return res.status(400).send(msg)
+            return res.status(400).send({error:msg})
         }
         app.db(dbNames.users)
             .select('id', 'nome', 'email')
             .where({ id: req.params.id })
             
             .then(user => res.json(user))
-            .catch(err => res.status(500).send({error:err.detail}))
+            .catch(err => res.status(500).send({error:err}))
     }
 
     const remove = async (req, res) => {
@@ -97,7 +97,7 @@ module.exports = app => {
 
             return res.status(204).send()
         } catch (msg) {
-            return res.status(400).send(msg)
+            return res.status(400).send({error:msg})
         }
     }
 

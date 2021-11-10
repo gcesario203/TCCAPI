@@ -33,7 +33,7 @@ module.exports = app => {
                 existOrError(room.chave, "Sala privada sem chave informada")
             }
         } catch (msg) {
-            return res.status(400).send(msg)
+            return res.status(400).send({error:msg})
         }
 
         if (room.tipo === roomType.private) {
@@ -49,7 +49,7 @@ module.exports = app => {
                 .update(room)
                 .where({ id: room.id })
                 .then(_ => res.status(202).send())
-                .catch(err => res.status(500).send({ error: err.detail }))
+                .catch(err => res.status(500).send({ error: err }))
         } else {
             await app.db.transaction(async trx => {
                 await app.db(dbNames.rooms)
@@ -64,7 +64,7 @@ module.exports = app => {
                     .catch(trx.rollback)
             })
                 .then(() => res.status(200).send())
-                .catch(err => res.status(500).send(err))
+                .catch(err => res.status(500).send({error:err}))
         }
     }
 
@@ -81,7 +81,7 @@ module.exports = app => {
 
             res.status(204).send()
         } catch (msg) {
-            return res.status(400).send(msg)
+            return res.status(400).send({error: msg})
         }
     }
 
@@ -100,7 +100,7 @@ module.exports = app => {
             .limit(limit)
             .offset(page * limit - limit)
             .then(rooms => res.json({ rooms, count, limit }))
-            .catch(err => res.status(500).send({ error: err.detail }))
+            .catch(err => res.status(500).send({ error: err }))
     }
 
     const getById = async (req, res) => {
@@ -113,13 +113,13 @@ module.exports = app => {
 
             existOrError(existId, "Sala inexistente")
         } catch (msg) {
-            return res.status(400).send(msg)
+            return res.status(400).send({error:msg})
         }
         await app.db(dbNames.rooms)
             .where({ id: req.params.id })
             .first()
             .then(room => res.json(room))
-            .catch(err => res.status(500).send({ error: err.detail }))
+            .catch(err => res.status(500).send({ error: err }))
     }
 
     const joinRoom = async (req, res) => {
@@ -141,7 +141,7 @@ module.exports = app => {
                 
                 const isMatch = bcrypt.compareSync(userxroom.chave, checkRoomId.chave)
 
-                if(!isMatch) return res.status(401).send('Chave incorreta')
+                if(!isMatch) return res.status(401).send({error: 'Chave incorreta'})
             }
 
             const checkUserId = await app.db(dbNames.users)
@@ -157,13 +157,13 @@ module.exports = app => {
 
             existOrError(!userInTheRoom, "Usuário já esta na sala")
         } catch (msg) {
-            return res.status(400).send(msg)
+            return res.status(400).send({error: msg})
         }
 
         app.db(dbNames.userRoomRelation)
             .insert({usuarioId: userxroom.usuarioId, salaId: userxroom.salaId})
             .then(_ => res.status(201).send())
-            .catch(err => res.status(500).send({ error: err.detail }))
+            .catch(err => res.status(500).send({ error: err }))
     }
 
     const disconnectFromRoom = async (req, res) => {
@@ -194,7 +194,7 @@ module.exports = app => {
 
             res.status(204).send()
         } catch (msg) {
-            return res.status(400).send(msg)
+            return res.status(400).send({error: msg})
         }
     }
 
@@ -205,7 +205,7 @@ module.exports = app => {
                 .replace('#offset', page * limit - limit)
                 .replace('#limit', limit))
             .then(rooms => res.json({ rooms: rooms.rows, limit }))
-            .catch(err => res.status(500).send(err))
+            .catch(err => res.status(500).send({error:err}))
 
     }
 
@@ -219,7 +219,7 @@ module.exports = app => {
 
             existOrError(existId, "Usuário inexistente")
         } catch (msg) {
-            return res.status(400).send(msg)
+            return res.status(400).send({error: msg})
         }
         app.db
             .raw( getRoomsFromUser
@@ -228,7 +228,7 @@ module.exports = app => {
                 .replace('#limit', limit))
             
             .then(rooms => res.json({ rooms: rooms.rows, limit }))
-            .catch(err => res.status(500).send(err))
+            .catch(err => res.status(500).send({error:err}))
     }
 
     const getUsersFromRoomId = async (req, res) =>{
@@ -241,7 +241,7 @@ module.exports = app => {
 
             existOrError(existId, "Sala inexistente")
         } catch (msg) {
-            return res.status(400).send(msg)
+            return res.status(400).send({error:msg})
         }
         app.db
             .raw( getUsersFromRoom
@@ -250,7 +250,7 @@ module.exports = app => {
                 .replace('#limit', limit))
             
             .then(rooms => res.json({ users: rooms.rows, limit }))
-            .catch(err => res.status(500).send(err))
+            .catch(err => res.status(500).send({error:err}))
     }
 
     return { save, remove, get, getById, joinRoom, disconnectFromRoom, getRoomsXUsers, getRoomsXUsersByUserId, getUsersFromRoomId }
