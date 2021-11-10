@@ -3,7 +3,6 @@ module.exports = app => {
     const { syncMessages, callMessagesByRoom} = app.core.business.message
 
     app.route('/messages')
-        .all(authenticate())
         .post(syncMessages)
 
     app.route('/messages/:id')
