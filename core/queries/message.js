@@ -15,6 +15,7 @@ module.exports = app => {
                  corerelations."salaId",
                  mensagens.conteudo,
                  mensagens.data_de_criacao
+        ORDER BY mensagens.data_de_criacao ASC
         `,
         getMessagesByRoomAndUse: `
         select mensagens.conteudo,  salas.nome, mensagens.data_de_criacao
@@ -29,6 +30,7 @@ module.exports = app => {
              corerelations."salaId",
              mensagens.conteudo,
              mensagens.data_de_criacao
+    ORDER BY mensagens.data_de_criacao ASC
         `
     }
     return message
